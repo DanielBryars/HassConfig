@@ -6,6 +6,8 @@ default_config:
 # http:
 #   base_url: example.duckdns.org:8123
 
+# this comment is a test
+
 lovelace:
   mode: yaml
 
