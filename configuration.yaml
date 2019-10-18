@@ -55,6 +55,14 @@ sensor sma:
     host: 192.168.1.104
     password: !secret smaPassword
     group: installer
+    
+input_number:
+    slider1:
+      name: HeatingTemp
+      initial: 18
+      min: 15
+      max: 25
+      step: 1
 
 ######## Monitoring ######
 sensor monitoring:
