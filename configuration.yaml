@@ -11,8 +11,8 @@ api:
 
 http:
 
-lovelace:
-  mode: yaml
+#lovelace:
+#  mode: yaml
 
 tts:
   - platform: google_translate
@@ -21,25 +21,7 @@ group: !include groups.yaml
 automation: !include automations.yaml
 script: !include scripts.yaml
 
-panel_iframe:
-  glances:
-    title: 'Glances'
-    url: 'http://192.168.1.106:61208/'
-    icon: mdi:server-network
-  portainer:
-    title: 'Portainer'
-    url: 'http://192.168.1.106:9000/'
-    icon: mdi:docker
-
-
 ####### Addons #########
-
-hacs:
-  token: c499206e0b1d7c7450bd81a1dbceaf4481d22716
-  appdaemon: True
-  python_script: True
-  theme: True
-
 
 ####### Sensors ########
 
@@ -56,13 +38,6 @@ sensor sma:
     password: !secret smaPassword
     group: installer
     
-input_number:
-    slider1:
-      name: HeatingTemp
-      initial: 18
-      min: 15
-      max: 25
-      step: 1
 
 ######## Monitoring ######
 sensor monitoring:
