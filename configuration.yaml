@@ -27,39 +27,38 @@ script: !include scripts.yaml
 
 sun:
 
-weather:
-  - platform: darksky
-    api_key: !secret darkSkyAPI
-    mode: daily
+#weather:
+#  - platform: darksky
+#    api_key: !secret darkSkyAPI
+#    mode: daily
 
-sensor sma:
-  - platform: sma
-    host: 192.168.1.104
-    password: !secret smaPassword
-    group: installer
+#sensor sma:
+#  - platform: sma
+#    host: 192.168.1.104
+#    password: !secret smaPassword
+#    group: installer
     
 
 ######## Monitoring ######
-sensor monitoring:
-  - platform: version
-  - platform: uptime
-  - platform: glances
-    name: "host"
-    host: 192.168.1.106
-    version: 3
-    resources:
-      - docker_active
-      - docker_cpu_use
-      - docker_memory_use
-      - cpu_temp
-      - cpu_use_percent
-      - swap_use_percent
-      - swap_use
-      - swap_free
-      - memory_use_percent
-      - memory_use
-      - memory_free
-      - disk_use_percent
-      - disk_use
-      - disk_free
+#sensor monitoring:
+#  - platform: version
+#  - platform: glances
+#    name: "host"
+#    host: 192.168.1.106
+#    version: 3
+#    resources:
+#      - docker_active
+#      - docker_cpu_use
+#      - docker_memory_use
+#      - cpu_temp
+#      - cpu_use_percent
+#      - swap_use_percent
+#      - swap_use
+#      - swap_free
+#      - memory_use_percent
+#      - memory_use
+#      - memory_free
+#      - disk_use_percent
+#      - disk_use
+#      - disk_free
 
