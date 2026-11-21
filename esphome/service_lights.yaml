@@ -1,0 +1,569 @@
+# Service Lights — Olimex ESP32-PoE-ISO driving 3x MCP23017 -> relay drivers.
+# Modernised from DanielBryars/HomeAutomation esp32Yml/service_lights.yml (ESPHome 1.13.6, 2019).
+# See docs/service-lights/README.md for wiring, photos and the Nov 2026 incident.
+#
+# Switch names are deliberately IDENTICAL to the 2019 firmware so Home Assistant keeps
+# the same entity IDs (switch.light_bank_N_pin_NN) and dashboards keep working.
+
+substitutions:
+  name: service_lights          # unchanged: HA's ESPHome entry and mDNS use this hostname
+  friendly_name: Service Lights
+
+esphome:
+  name: ${name}
+  friendly_name: ${friendly_name}
+
+esp32:
+  board: esp32-poe-iso
+  framework:
+    type: arduino
+
+ethernet:
+  type: LAN8720
+  mdc_pin: GPIO23
+  mdio_pin: GPIO18
+  clk:
+    pin: GPIO17
+    mode: CLK_OUT
+  phy_addr: 0
+  power_pin: GPIO12
+
+logger:
+
+# No API encryption yet, to match the existing HA integration. Adding `encryption:` later
+# means re-entering the key in HA (Settings > Devices > ESPHome > Service Lights > Reconfigure).
+api:
+
+ota:
+  - platform: esphome
+    password: !secret service_lights_ota_password
+
+i2c:
+  id: bus_lights
+  sda: GPIO13   # EXT2 pin 10 — blue jumper
+  scl: GPIO16   # EXT2 pin 7  — yellow jumper (the one that fell off, Nov 2026)
+  scan: true
+  frequency: 100kHz
+
+mcp23017:
+  - id: mcp23017_lights_20
+    address: 0x20
+  - id: mcp23017_lights_21
+    address: 0x21
+  - id: mcp23017_lights_22
+    address: 0x22
+
+# --- Health / maintenance (none of this existed in 2019) ---
+button:
+  - platform: restart
+    name: Restart
+
+sensor:
+  - platform: uptime
+    name: Uptime
+
+binary_sensor:
+  - platform: status
+    name: Status
+  # Turns ON when any expander failed to answer at boot (e.g. an I2C wire is off).
+  # The 2019 firmware failed silently in this situation.
+  - platform: template
+    name: I2C Expander Problem
+    device_class: problem
+    entity_category: diagnostic
+    lambda: |-
+      return id(mcp23017_lights_20).is_failed() ||
+             id(mcp23017_lights_21).is_failed() ||
+             id(mcp23017_lights_22).is_failed();
+
+text_sensor:
+  - platform: version
+    name: ESPHome Version
+
+# --- Outputs ---
+# Lights are on impulse relays: HA dashboards send ON then OFF (a pulse).
+# ALWAYS_OFF ensures a reboot never leaves an output held on.
+switch:
+  # ---------------- Bank 0 (mcp23017_lights_20, 0x20) ----------------
+  - platform: gpio
+    name: "Light Bank 0 Pin #00"   # Toilet
+    id: light_bank_0_pin_00
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_20
+      number: 0
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 0 Pin #01"   # East Wall
+    id: light_bank_0_pin_01
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_20
+      number: 1
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 0 Pin #02"   # West Wall
+    id: light_bank_0_pin_02
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_20
+      number: 2
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 0 Pin #03"
+    id: light_bank_0_pin_03
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_20
+      number: 3
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 0 Pin #04"
+    id: light_bank_0_pin_04
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_20
+      number: 4
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 0 Pin #05"
+    id: light_bank_0_pin_05
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_20
+      number: 5
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 0 Pin #06"   # North Top
+    id: light_bank_0_pin_06
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_20
+      number: 6
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 0 Pin #07"
+    id: light_bank_0_pin_07
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_20
+      number: 7
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 0 Pin #08"
+    id: light_bank_0_pin_08
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_20
+      number: 8
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 0 Pin #09"   # Lincolns
+    id: light_bank_0_pin_09
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_20
+      number: 9
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 0 Pin #10"   # Deck (outside)
+    id: light_bank_0_pin_10
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_20
+      number: 10
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 0 Pin #11"
+    id: light_bank_0_pin_11
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_20
+      number: 11
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 0 Pin #12"   # Hallway
+    id: light_bank_0_pin_12
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_20
+      number: 12
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 0 Pin #13"
+    id: light_bank_0_pin_13
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_20
+      number: 13
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 0 Pin #14"   # Entrance
+    id: light_bank_0_pin_14
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_20
+      number: 14
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 0 Pin #15"   # Front Door (outside)
+    id: light_bank_0_pin_15
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_20
+      number: 15
+      mode:
+        output: true
+      inverted: true
+  # ---------------- Bank 1 (mcp23017_lights_21, 0x21) ----------------
+  - platform: gpio
+    name: "Light Bank 1 Pin #00"   # Mummy + Daddy
+    id: light_bank_1_pin_00
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_21
+      number: 0
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 1 Pin #01"
+    id: light_bank_1_pin_01
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_21
+      number: 1
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 1 Pin #02"
+    id: light_bank_1_pin_02
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_21
+      number: 2
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 1 Pin #03"
+    id: light_bank_1_pin_03
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_21
+      number: 3
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 1 Pin #04"
+    id: light_bank_1_pin_04
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_21
+      number: 4
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 1 Pin #05"   # South Top
+    id: light_bank_1_pin_05
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_21
+      number: 5
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 1 Pin #06"
+    id: light_bank_1_pin_06
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_21
+      number: 6
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 1 Pin #07"
+    id: light_bank_1_pin_07
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_21
+      number: 7
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 1 Pin #08"   # Workshop
+    id: light_bank_1_pin_08
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_21
+      number: 8
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 1 Pin #09"   # Kitchen Downlights
+    id: light_bank_1_pin_09
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_21
+      number: 9
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 1 Pin #10"
+    id: light_bank_1_pin_10
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_21
+      number: 10
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 1 Pin #11"
+    id: light_bank_1_pin_11
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_21
+      number: 11
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 1 Pin #12"
+    id: light_bank_1_pin_12
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_21
+      number: 12
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 1 Pin #13"
+    id: light_bank_1_pin_13
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_21
+      number: 13
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 1 Pin #14"
+    id: light_bank_1_pin_14
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_21
+      number: 14
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 1 Pin #15"   # Kitchen Island
+    id: light_bank_1_pin_15
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_21
+      number: 15
+      mode:
+        output: true
+      inverted: true
+  # ---------------- Bank 2 (mcp23017_lights_22, 0x22) ----------------
+  - platform: gpio
+    name: "Light Bank 2 Pin #00"
+    id: light_bank_2_pin_00
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_22
+      number: 0
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 2 Pin #01"   # Storage
+    id: light_bank_2_pin_01
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_22
+      number: 1
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 2 Pin #02"   # Utility
+    id: light_bank_2_pin_02
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_22
+      number: 2
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 2 Pin #03"   # Spare
+    id: light_bank_2_pin_03
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_22
+      number: 3
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 2 Pin #04"
+    id: light_bank_2_pin_04
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_22
+      number: 4
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 2 Pin #05"   # En Suite
+    id: light_bank_2_pin_05
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_22
+      number: 5
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 2 Pin #06"
+    id: light_bank_2_pin_06
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_22
+      number: 6
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 2 Pin #07"
+    id: light_bank_2_pin_07
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_22
+      number: 7
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 2 Pin #08"   # Bath Room
+    id: light_bank_2_pin_08
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_22
+      number: 8
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 2 Pin #09"
+    id: light_bank_2_pin_09
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_22
+      number: 9
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 2 Pin #10"   # Max
+    id: light_bank_2_pin_10
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_22
+      number: 10
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 2 Pin #11"
+    id: light_bank_2_pin_11
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_22
+      number: 11
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 2 Pin #12"
+    id: light_bank_2_pin_12
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_22
+      number: 12
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 2 Pin #13"
+    id: light_bank_2_pin_13
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_22
+      number: 13
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 2 Pin #14"   # Backdoor (outside)
+    id: light_bank_2_pin_14
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_22
+      number: 14
+      mode:
+        output: true
+      inverted: true
+  - platform: gpio
+    name: "Light Bank 2 Pin #15"
+    id: light_bank_2_pin_15
+    restore_mode: ALWAYS_OFF
+    pin:
+      mcp23xxx: mcp23017_lights_22
+      number: 15
+      mode:
+        output: true
+      inverted: true

@@ -1,0 +1,116 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 700" width="920" height="700" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13">
+  <rect width="920" height="700" fill="#ffffff"/>
+  <text x="24" y="32" font-size="19" font-weight="600" fill="#1a1a1a">Service Lights — ESP32 to expander board wiring</text>
+  <text x="24" y="52" fill="#555">Solid = confirmed from config + photos (Nov 2026). Dashed / "?" = inferred from photos, verify with a multimeter.</text>
+
+  <!-- ESP32 board -->
+  <rect x="24" y="80" width="300" height="290" rx="10" fill="#fbe9e9" stroke="#b3261e" stroke-width="2"/>
+  <text x="40" y="106" font-size="15" font-weight="600" fill="#b3261e">Olimex ESP32-PoE-ISO</text>
+  <text x="40" y="124" fill="#444">"service_lights" · 192.168.1.119 · PoE powered</text>
+  <text x="40" y="141" fill="#444">ESPHome 1.13.6 (2019) · I2C 100 kHz</text>
+
+  <g font-family="Consolas, Menlo, monospace" font-size="13" fill="#1a1a1a">
+    <text x="40" y="184">EXT1-1  +5V   (power?)</text>
+    <text x="40" y="234">EXT1-3  GND</text>
+    <text x="40" y="284">EXT2-7  GPIO16 · SCL</text>
+    <text x="40" y="334">EXT2-10 GPIO13 · SDA</text>
+  </g>
+  <g fill="#1a1a1a">
+    <rect x="316" y="172" width="16" height="16"/>
+    <rect x="316" y="222" width="16" height="16"/>
+    <rect x="316" y="272" width="16" height="16"/>
+    <rect x="316" y="322" width="16" height="16"/>
+  </g>
+
+  <!-- wires -->
+  <path d="M332 180 C 420 180, 440 180, 540 180" stroke="#8d6e63" stroke-width="4" fill="none" stroke-dasharray="9 6"/>
+  <path d="M332 230 C 420 230, 440 230, 540 230" stroke="#1e63c4" stroke-width="5" fill="none"/>
+  <path d="M332 280 C 420 280, 440 280, 540 280" stroke="#e0b400" stroke-width="5" fill="none"/>
+  <path d="M332 330 C 420 330, 440 330, 540 330" stroke="#1e63c4" stroke-width="5" fill="none"/>
+  <text x="372" y="172" fill="#6d4c41">thin brown</text>
+  <text x="372" y="222" fill="#1e63c4">blue · GND</text>
+  <text x="372" y="272" fill="#8a6d00" font-weight="600">yellow · SCL (came loose)</text>
+  <text x="372" y="322" fill="#1e63c4">blue · SDA</text>
+
+  <!-- veroboard -->
+  <rect x="540" y="80" width="356" height="400" rx="10" fill="#fdf3e1" stroke="#a06a1b" stroke-width="2"/>
+  <text x="556" y="106" font-size="15" font-weight="600" fill="#a06a1b">Expander veroboard (hand-built, 2019)</text>
+  <text x="556" y="124" fill="#444">4-way Dupont header: yellow, blue, blue, purple</text>
+  <text x="556" y="141" fill="#444">brown → pull-up resistor / supply rail (?)</text>
+  <text x="556" y="158" fill="#444">SDA / SCL shared by all three chips</text>
+
+  <!-- I2C bus: SDA (blue, from y=330) and SCL (yellow, from y=280) -->
+  <line x1="560" y1="210" x2="560" y2="330" stroke="#1e63c4" stroke-width="3"/>
+  <line x1="574" y1="210" x2="574" y2="372" stroke="#e0b400" stroke-width="3"/>
+  <line x1="540" y1="330" x2="560" y2="330" stroke="#1e63c4" stroke-width="3"/>
+  <line x1="560" y1="330" x2="560" y2="366" stroke="#1e63c4" stroke-width="3"/>
+  <line x1="540" y1="280" x2="574" y2="280" stroke="#e0b400" stroke-width="3"/>
+  <!-- GND and power terminate at the board rails -->
+  <circle cx="546" cy="230" r="5" fill="#1e63c4"/>
+  <circle cx="546" cy="180" r="5" fill="#8d6e63"/>
+  
+
+  <g>
+    <rect x="600" y="190" width="280" height="56" rx="6" fill="#ffffff" stroke="#333"/>
+    <text x="612" y="212" font-weight="600">MCP23017 U1 · addr 0x20</text>
+    <text x="612" y="232" fill="#444">"Light Bank 0" · 16 outputs, active-low</text>
+    <rect x="600" y="262" width="280" height="56" rx="6" fill="#ffffff" stroke="#333"/>
+    <text x="612" y="284" font-weight="600">MCP23017 U2 · addr 0x21</text>
+    <text x="612" y="304" fill="#444">"Light Bank 1" · 16 outputs, active-low</text>
+    <rect x="600" y="334" width="280" height="56" rx="6" fill="#ffffff" stroke="#333"/>
+    <text x="612" y="356" font-weight="600">MCP23017 U3 · addr 0x22</text>
+    <text x="612" y="376" fill="#444">"Light Bank 2" · 16 outputs, active-low</text>
+  </g>
+  <line x1="560" y1="218" x2="600" y2="218" stroke="#1e63c4" stroke-width="2"/>
+  <line x1="574" y1="226" x2="600" y2="226" stroke="#e0b400" stroke-width="2"/>
+  <line x1="560" y1="290" x2="600" y2="290" stroke="#1e63c4" stroke-width="2"/>
+  <line x1="574" y1="298" x2="600" y2="298" stroke="#e0b400" stroke-width="2"/>
+  <line x1="560" y1="362" x2="600" y2="362" stroke="#1e63c4" stroke-width="2"/>
+  <line x1="574" y1="370" x2="600" y2="370" stroke="#e0b400" stroke-width="2"/>
+  <text x="600" y="420" fill="#444">→ driver transistors (TO-92, not traced)</text>
+  <text x="600" y="440" fill="#444">→ impulse relays (inferred: HA sends</text>
+  <text x="600" y="458" fill="#444">   on→off pulses of 1–4 s per press)</text>
+
+  <!-- PSU -->
+  <rect x="540" y="500" width="356" height="46" rx="8" fill="#eeeeee" stroke="#777" stroke-dasharray="6 4"/>
+  <text x="556" y="528" fill="#333">DIN/box PSU ← purple wire from veroboard header (?)</text>
+  <line x1="880" y1="480" x2="880" y2="500" stroke="#7e57c2" stroke-width="4" stroke-dasharray="7 5"/>
+
+  <!-- header inset -->
+  <text x="24" y="420" font-size="15" font-weight="600" fill="#1a1a1a">ESP32-PoE-ISO header pinout (pin 1 = end nearest the ESP32 module)</text>
+  <g font-family="Consolas, Menlo, monospace" font-size="11">
+    <text x="24" y="448" font-weight="600">EXT1</text>
+    <g transform="translate(70,434)">
+      <rect x="0"   width="44" height="22" fill="#d7ccc8" stroke="#6d4c41"/><text x="4"   y="15">1 +5V</text>
+      <rect x="46"  width="44" height="22" fill="#fff" stroke="#999"/><text x="50"  y="15">2 3V3</text>
+      <rect x="92"  width="44" height="22" fill="#bbdefb" stroke="#1e63c4"/><text x="96"  y="15">3 GND</text>
+      <rect x="138" width="44" height="22" fill="#fff" stroke="#999"/><text x="142" y="15">4 EN</text>
+      <rect x="184" width="44" height="22" fill="#fff" stroke="#999"/><text x="188" y="15">5 IO0</text>
+      <rect x="230" width="44" height="22" fill="#fff" stroke="#999"/><text x="234" y="15">6 IO1</text>
+      <rect x="276" width="44" height="22" fill="#fff" stroke="#999"/><text x="280" y="15">7 IO2</text>
+      <rect x="322" width="44" height="22" fill="#fff" stroke="#999"/><text x="326" y="15">8 IO3</text>
+      <rect x="368" width="44" height="22" fill="#fff" stroke="#999"/><text x="372" y="15">9 IO4</text>
+      <rect x="414" width="44" height="22" fill="#fff" stroke="#999"/><text x="416" y="15">10 IO5</text>
+    </g>
+    <text x="24" y="490" font-weight="600">EXT2</text>
+    <g transform="translate(70,476)">
+      <rect x="0"   width="44" height="22" fill="#fff" stroke="#999"/><text x="4"   y="15">1 I39</text>
+      <rect x="46"  width="44" height="22" fill="#fff" stroke="#999"/><text x="50"  y="15">2 I36</text>
+      <rect x="92"  width="44" height="22" fill="#fff" stroke="#999"/><text x="96"  y="15">3 I35</text>
+      <rect x="138" width="44" height="22" fill="#fff" stroke="#999"/><text x="142" y="15">4 I34</text>
+      <rect x="184" width="44" height="22" fill="#fff" stroke="#999"/><text x="188" y="15">5 IO33</text>
+      <rect x="230" width="44" height="22" fill="#fff" stroke="#999"/><text x="234" y="15">6 IO32</text>
+      <rect x="276" width="44" height="22" fill="#fff3b0" stroke="#e0b400" stroke-width="2"/><text x="280" y="15">7 IO16</text>
+      <rect x="322" width="44" height="22" fill="#fff" stroke="#999"/><text x="326" y="15">8 IO15</text>
+      <rect x="368" width="44" height="22" fill="#fff" stroke="#999"/><text x="372" y="15">9 IO14</text>
+      <rect x="414" width="44" height="22" fill="#bbdefb" stroke="#1e63c4"/><text x="416" y="15">10 IO13</text>
+    </g>
+  </g>
+  <text x="70" y="526" fill="#444">Highlighted = in use. EXT2-10 is the end pin nearest the Ethernet jack;</text>
+  <text x="70" y="544" fill="#444">SCL (yellow) goes on the 3rd pin back from SDA (blue), skipping IO14 and IO15.</text>
+
+  <text x="24" y="600" font-size="13" fill="#b3261e" font-weight="600">Caution</text>
+  <text x="24" y="620" fill="#444">If the brown wire really is on +5V and the I2C pull-ups go to 5V, the ESP32's 3.3 V-only GPIO13/16 see 5 V.</text>
+  <text x="24" y="638" fill="#444">It has survived since 2019, but measure SDA/SCL idle voltage — and design the replacement board for 3.3 V I2C.</text>
+  <text x="24" y="672" fill="#888" font-size="12">Source: esp32Yml/service_lights.yml (DanielBryars/HomeAutomation), Olimex EXT1/EXT2 schematic, photos in ./photos.</text>
+</svg>
