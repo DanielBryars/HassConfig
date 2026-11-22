@@ -12,7 +12,7 @@ flowchart LR
     ESP -- "I2C · SDA GPIO13 · SCL GPIO16" --> U1["MCP23017 0x20<br/>Light Bank 0"]
     ESP -- I2C --> U2["MCP23017 0x21<br/>Light Bank 1"]
     ESP -- I2C --> U3["MCP23017 0x22<br/>Light Bank 2"]
-    U1 & U2 & U3 --> DRV["Transistor drivers"] --> REL["Impulse relays (inferred)"] --> L["Lights"]
+    U1 & U2 & U3 --> DRV["Transistor drivers"] --> REL["Relays (one per output)"] --> L["Lights"]
 ```
 
 ## Wiring
@@ -38,9 +38,10 @@ in the HomeAutomation repo. The modernised version is in [`/esphome/service_ligh
 ### How the lights are switched
 
 Each dashboard button toggles a `switch.light_bank_<bank>_pin_<nn>` entity. Outputs are
-active-low (`inverted: true`). The logbook shows people always press **on, then off 1–4 s later**,
-i.e. a pulse, which is why we think the lights are on impulse (latching) relays. It also means HA's
-on/off state does **not** tell you whether a light is actually lit.
+active-low (`inverted: true`). Each output holds its relay on or off directly, so **HA's on/off
+state is the light's state**. (The rapid on→off presses in the 20 Nov logbook were people
+testing during the outage, not pulse relays.) The modernised firmware uses
+`restore_mode: RESTORE_DEFAULT_OFF`, so lights come back as they were after an ESP reboot.
 
 ### Channel map (from the HA dashboards)
 
