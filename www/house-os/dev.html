@@ -45,7 +45,7 @@ if (P.has('demo') || !token) {
   const ws = new WebSocket(url);
   const send = (m) => new Promise((res, rej) => { m.id = ++id; pending[m.id] = { res, rej }; ws.send(JSON.stringify(m)); });
   let states = {};
-  const push = () => { el.hass = { states, callService: (domain, service, service_data) => send({ type: 'call_service', domain, service, service_data }) }; };
+  const push = () => { el.hass = { states, callWS: (m) => send({ ...m }), callService: (domain, service, service_data) => send({ type: 'call_service', domain, service, service_data }) }; };
   ws.onmessage = async (ev) => {
     const m = JSON.parse(ev.data);
     if (m.type === 'auth_required') ws.send(JSON.stringify({ type: 'auth', access_token: token }));

@@ -410,6 +410,20 @@ class HouseOS extends HTMLElement {
     this.renderer.domElement.style.cursor = L ? 'pointer' : '';
     this._renderInsp();
   }
+  // Room photos live in HA's media folder (/media/house-os), not the public /config/www, so they
+  // need a logged-in session: resolve_media returns a short-lived signed URL. The standalone demo
+  // (no callWS) falls back to ./img/.
+  _photoUrl(name) {
+    const cache = (this._photos ||= {}), hit = cache[name];
+    if (hit && hit.exp > Date.now()) return hit.p;
+    const dir = this._config?.photo_dir ?? 'house-os';
+    const p = this._hass?.callWS
+      ? this._hass.callWS({ type: 'media_source/resolve_media', media_content_id: `media-source://media_source/local/${dir}/${name}.jpg`, expires: 3600 })
+          .then((r) => r.url, () => { delete cache[name]; return null; })
+      : Promise.resolve(BASE + 'img/' + name + '.jpg');
+    cache[name] = { p, exp: Date.now() + 50 * 60 * 1000 };
+    return p;
+  }
   _renderInsp() {
     const L = this.hover || this.sel, box = this.$('.insp');
     box.classList.toggle('show', !!L);
@@ -419,8 +433,16 @@ class HouseOS extends HTMLElement {
     box.classList.toggle('lit', on); box.classList.toggle('dead', !L.avail);
     const photo = L.cfg?.photo || (L.isStep ? 'stairs' : null);
     const img = this.$('.insp .ph');
-    if (photo) { const src = BASE + 'img/' + photo + '.jpg'; if (img.dataset.src !== src) { img.dataset.src = src; img.style.backgroundImage = `url("${src}")`; img.classList.remove('flash'); void img.offsetWidth; img.classList.add('flash'); } img.style.display = ''; }
-    else img.style.display = 'none';
+    if (photo) {
+      if (img.dataset.photo !== photo) {
+        img.dataset.photo = photo; img.style.backgroundImage = '';
+        this._photoUrl(photo).then((u) => {
+          if (!u || img.dataset.photo !== photo) return;
+          img.style.backgroundImage = `url("${u}")`; img.classList.remove('flash'); void img.offsetWidth; img.classList.add('flash');
+        });
+      }
+      img.style.display = '';
+    } else img.style.display = 'none';
     this.$('.insp h2').textContent = L.name;
     this.$('.insp .meta').innerHTML = `<div><span>STATE</span><b class="s">${!L.avail ? 'OFFLINE' : on ? 'ON' : 'OFF'}</b><em>${st ? 'for ' + ago(st.last_changed) : ''}</em></div>
       <div><span>CHANNEL</span><b>${L.ch.long}</b></div><div><span>ENTITY</span><b>${L.entity || '—'}</b></div>

@@ -42,7 +42,7 @@ Lovelace card (`custom:house-os-card`) and works on desktop, tablet and the phon
 
 ## Install in Home Assistant
 
-1. Copy the whole `www/house-os/` folder (including `img/`) to `/config/www/house-os/` on the HA box,
+1. Copy `www/house-os/` (**without** `img/`) to `/config/www/house-os/`, and the photos in `img/` to `/media/house-os/`. `/local` is public, `/media` needs a login. Copy
    e.g. drag it into **Studio Code Server**, or use `scp -r` through the **Advanced SSH** add-on.
 2. Settings → Dashboards → ⋮ → **Resources** → add `/local/house-os/house-os.js?v=1` as a *JavaScript module*.
 3. Settings → Dashboards → **Add dashboard** (e.g. "House", icon `mdi:home-lightning-bolt`). Add a view with
