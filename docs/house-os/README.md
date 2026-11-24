@@ -37,7 +37,7 @@ Lovelace card (`custom:house-os-card`) and works on desktop, tablet and the phon
 | `www/house-os/house-os.js` | The card (plain ES module, no build step) |
 | `www/house-os/house.json` | Geometry (walls, glazing, room zones, stair arc) and the light→room→fixture map |
 | `www/house-os/vendor/` | three.js r170 and the addons it uses, imports rewritten to be relative (no CDN needed) |
-| `www/house-os/img/` | Room stills from the walkthrough video. **Git-ignored** (private interiors). Regenerate from `E:\Video\C1895.MP4` |
+| `www/house-os/img/` | Room stills from the walkthrough video (source `E:\Video\C1895.MP4`). **Git-ignored.** Only the local demo reads them from here. On HA they live in `/media/house-os/` (login required) and the card fetches them through `media_source/resolve_media` signed URLs |
 | `www/house-os/dev.html` | Standalone harness: `dev.html#demo` (simulated) or `dev.html#token=<HA access token>` (live) |
 
 ## Install in Home Assistant
