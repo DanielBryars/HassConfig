@@ -33,6 +33,7 @@ This repository contains a streamlined Home Assistant setup designed to run in a
 ## Hardware docs
 
 - [Service Lights](docs/service-lights/README.md): the ESP32 and MCP23017 rig that switches the house lights. Covers wiring diagram, channel→room map, photos, and the Nov 2026 "all lights stopped" incident.
+- [HOUSE//OS](docs/house-os/README.md): holographic 3D model of the house with live, clickable lights (Lovelace card in `www/house-os`).
 - [`esphome/`](esphome/): modernised ESPHome configs (secrets in a git-ignored `esphome/secrets.yaml`, template in `secrets.yaml.example`).
 
 ## Technologies

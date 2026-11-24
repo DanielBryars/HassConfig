@@ -55,3 +55,7 @@ notebooks/
 
 
 
+
+# HOUSE//OS: geometry data is needed; room photos stay local (private interiors)
+!www/house-os/house.json
+www/house-os/img/

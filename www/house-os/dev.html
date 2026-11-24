@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HOUSE//OS</title>
+<style>html,body{margin:0;height:100%;background:#02050b;overflow:hidden}house-os-card{--hos-height:100vh}</style>
+</head>
+<body>
+<house-os-card></house-os-card>
+<script type="module">
+// Standalone harness for house-os.js.
+//   dev.html#demo                 simulated states, nothing touches HA
+//   dev.html#token=<access token> live, talks to wss://ha.bryars.com:8123 (or &ha=<wss url>)
+import './house-os.js';
+const el = document.querySelector('house-os-card');
+el.setConfig({});
+const P = new URLSearchParams(location.hash.slice(1));
+let token = P.get('token');
+try { if (token) localStorage.setItem('hos_token', token); else token = localStorage.getItem('hos_token'); } catch (e) {}
+if (P.has('token')) history.replaceState(null, '', location.pathname);
+
+if (P.has('demo') || !token) {
+  const D = await (await fetch('./house.json')).json();
+  const states = {}, now = new Date().toISOString();
+  const lit = new Set(['North Top', 'Kitchen Island', 'Kitchen Downlights', 'West Wall', 'Hallway', 'Max', 'Deck', 'Mummy + Daddy']);
+  for (const l of D.lights) states[l.entity] = { state: lit.has(l.name) ? 'on' : 'off', last_changed: now, attributes: {} };
+  for (const s of D.stairLights) states[s.entity] = { state: s.step % 3 ? 'off' : 'on', last_changed: now, attributes: {} };
+  for (const s of D.shed) states[s.entity] = { state: s.name === 'Lathe' ? 'on' : 'off', last_changed: now, attributes: {} };
+  states[D.sensors.power] = { state: '2309', attributes: {} };
+  states[D.sensors.solar] = { state: '0', attributes: {} };
+  states[D.sensors.weather] = { state: 'cloudy', attributes: { temperature: 7 } };
+  const hass = { demo: true, states, callService(domain, service, data) {
+    return new Promise((res) => setTimeout(() => {
+      const s = hass.states[data.entity_id];
+      const on = service === 'toggle' ? s.state !== 'on' : service === 'turn_on';
+      hass.states = { ...hass.states, [data.entity_id]: { ...s, state: on ? 'on' : 'off', last_changed: new Date().toISOString() } };
+      el.hass = { ...hass }; res();
+    }, 250));
+  } };
+  el.hass = hass;
+} else {
+  const url = P.get('ha') || 'wss://ha.bryars.com:8123/api/websocket';
+  let id = 0; const pending = {};
+  const ws = new WebSocket(url);
+  const send = (m) => new Promise((res, rej) => { m.id = ++id; pending[m.id] = { res, rej }; ws.send(JSON.stringify(m)); });
+  let states = {};
+  const push = () => { el.hass = { states, callService: (domain, service, service_data) => send({ type: 'call_service', domain, service, service_data }) }; };
+  ws.onmessage = async (ev) => {
+    const m = JSON.parse(ev.data);
+    if (m.type === 'auth_required') ws.send(JSON.stringify({ type: 'auth', access_token: token }));
+    else if (m.type === 'auth_invalid') { try { localStorage.removeItem('hos_token'); } catch (e) {} document.title = 'auth failed'; alert('HA token rejected'); }
+    else if (m.type === 'auth_ok') {
+      const r = await send({ type: 'get_states' });
+      for (const s of r) states[s.entity_id] = s; push();
+      send({ type: 'subscribe_events', event_type: 'state_changed' });
+    } else if (m.type === 'result') { const p = pending[m.id]; if (p) { delete pending[m.id]; m.success ? p.res(m.result) : p.rej(m.error); } }
+    else if (m.type === 'event') { const d = m.event.data; states = { ...states }; if (d.new_state) states[d.entity_id] = d.new_state; else delete states[d.entity_id]; push(); }
+  };
+}
+</script>
+</body>
+</html>
