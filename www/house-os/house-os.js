@@ -208,22 +208,29 @@ class HouseOS extends HTMLElement {
     for (const w of F.walls) {
       const sh = this._shape(w.o);
       for (const h of w.h) sh.holes.push(new THREE.Path(h.map(([x, y]) => { const [a, b] = this._p(x, y); return new THREE.Vector2(a, -b); })));
-      const g = new THREE.ExtrudeGeometry(sh, { depth: F.height, bevelEnabled: false, curveSegments: 1 }); g.rotateX(-Math.PI / 2);
+      // w.ht: lower walls, e.g. the deck's 1.1 m block balustrades
+      const g = new THREE.ExtrudeGeometry(sh, { depth: w.ht ?? F.height, bevelEnabled: false, curveSegments: 1 }); g.rotateX(-Math.PI / 2);
       grp.add(new THREE.Mesh(g, [cap, side]));
       grp.add(new THREE.LineSegments(new THREE.EdgesGeometry(g, 28), edge));
     }
     // glazing / thin lines -> glass ribbons
     const glass = reg(new THREE.MeshBasicMaterial({ color: 0x1f8fd8, transparent: true, opacity: 0.1, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, depthWrite: false }));
     const gline = reg(new THREE.LineBasicMaterial({ color: 0x7fe9ff, transparent: true, opacity: 0.7, blending: THREE.AdditiveBlending, depthWrite: false }));
-    const H = F.height * 0.92, pos = [], lpos = [];
-    for (const pl of F.lines) for (let i = 0; i < pl.length - 1; i++) {
-      const [a, b] = this._p(...pl[i]), [c, d] = this._p(...pl[i + 1]);
-      if (Math.hypot(c - a, d - b) < 0.02) continue;
-      pos.push(a, 0, b, c, 0, d, c, H, d, a, 0, b, c, H, d, a, H, b);
-      lpos.push(a, H, b, c, H, d);
-    }
-    const gg = new THREE.BufferGeometry(); gg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); grp.add(new THREE.Mesh(gg, glass));
-    const lg = new THREE.BufferGeometry(); lg.setAttribute('position', new THREE.Float32BufferAttribute(lpos, 3)); grp.add(new THREE.LineSegments(lg, gline));
+    // full-height glazing, plus low glass balustrades (the deck's S-curve) with a brighter handrail
+    const rail = reg(new THREE.LineBasicMaterial({ color: 0xb8f6ff, transparent: true, opacity: 0.95, blending: THREE.AdditiveBlending, depthWrite: false }));
+    const ribbons = (lines, H, lineMat) => {
+      const pos = [], lpos = [];
+      for (const pl of lines) for (let i = 0; i < pl.length - 1; i++) {
+        const [a, b] = this._p(...pl[i]), [c, d] = this._p(...pl[i + 1]);
+        if (Math.hypot(c - a, d - b) < 0.02) continue;
+        pos.push(a, 0, b, c, 0, d, c, H, d, a, 0, b, c, H, d, a, H, b);
+        lpos.push(a, H, b, c, H, d);
+      }
+      const gg = new THREE.BufferGeometry(); gg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); grp.add(new THREE.Mesh(gg, glass));
+      const lg = new THREE.BufferGeometry(); lg.setAttribute('position', new THREE.Float32BufferAttribute(lpos, 3)); grp.add(new THREE.LineSegments(lg, lineMat));
+    };
+    ribbons(F.lines, F.height * 0.92, gline);
+    if (F.lowLines) ribbons(F.lowLines, F.lowHeight ?? 1.1, rail);
     // room floors
     for (const rm of F.rooms) {
       const band = ['hall_east', 'hall_west', 'kitchen_island', 'bathroom_mirror', 'front_door', 'backdoor'].includes(rm.id);
