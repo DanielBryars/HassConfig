@@ -10,6 +10,8 @@ import { OutputPass } from './vendor/OutputPass.js';
 import { CSS2DRenderer, CSS2DObject } from './vendor/CSS2DRenderer.js';
 
 const BASE = new URL('.', import.meta.url).href;
+// HA serves /local with a 31-day cache, so house.json carries the card's ?v= too.
+const BUST = new URL(import.meta.url).search;
 const VERSION = '1.0';
 const COL = {
   cyan: new THREE.Color(0x43e8ff), cyanDim: new THREE.Color(0x0e5a78), warm: new THREE.Color(0xffa63d),
@@ -103,7 +105,7 @@ class HouseOS extends HTMLElement {
     this.shadowRoot.innerHTML = `<style>${CSS}</style>${HTML}`;
     this.$ = (s) => this.shadowRoot.querySelector(s);
     this._bootLog('HOUSE//OS ' + VERSION + ' · cold start');
-    const res = await fetch(BASE + 'house.json'); this.D = await res.json();
+    const res = await fetch(BASE + 'house.json' + BUST, { cache: 'no-cache' }); this.D = await res.json();
     this._bootLog(`geometry  W175-26D / W175-27I  @1:100 … ok`);
     this._initThree();
     this._buildWorld();
