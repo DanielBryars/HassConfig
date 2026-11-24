@@ -71,8 +71,8 @@ on the video lines up with a logbook entry once you offset by 16:53:49 UTC.
 | Hallway | `0_12` | lower ground hallway |
 | Workshop | `1_08` | lower ground, under the living room |
 | Spare Room | `2_03` | bed 4 |
-| Max | `2_10` | bed 2 *(assumed; swap with Lincolns if wrong)* |
-| Lincolns | `0_09` | bed 3 *(assumed)* |
+| Max | `2_10` | bed 3 |
+| Lincolns | `0_09` | bed 2 |
 | Back Door | `2_14` | outside D3, end of the bedroom corridor |
 | Bathroom / Bathroom Mirror | `2_08` / **`1_07`** | main bathroom. 1_07 was unlabelled until the video |
 | Mummy + Daddy / En Suite | `1_00` / `2_05` | bed 1 and its en suite |
